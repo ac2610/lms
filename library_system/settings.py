@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'members',
     'inventory',
     'borrowing',
+    'corsheaders'
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +52,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+# for testing 
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'library_system.urls'
 
@@ -125,3 +129,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://lms-5-8yzb.onrender.com",
+]
