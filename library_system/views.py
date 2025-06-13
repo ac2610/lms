@@ -6,12 +6,10 @@ from members.models import Member
 from borrowing.models import BorrowRecord
 from utils.book_status import update_book_status
 from django.utils import timezone
-from django.http import HttpResponse
-
 
 @require_http_methods(["GET", "POST"])
 def homepage(request):
-    return HttpResponse("✅ LMS is Live")
+    
     message = request.GET.get('message')
     error = request.GET.get('error')
     available_books = Book.objects.filter(available_copies__gt=0)
