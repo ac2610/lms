@@ -12,8 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+
+# At the bottom of settings.py
+STATIC_URL = '/static/'
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# For collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--$)jy26^s(7y5x)athe-#*nl$!8guhng(kccs=92ah!_+vaais'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['lms-5-8yzb.onrender.com', 'localhost', '127.0.0.1', '.ngrok.io', '0222-122-172-80-115.ngrok-free.app']
 
@@ -45,6 +54,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware' #(for static file serving)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
