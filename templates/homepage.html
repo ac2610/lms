@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+{% block content %}
+<h1 class="text-center mt-4">📚 Library Management System</h1>
+
+<!-- Message Alert Container -->
+<div id="alert-container"></div>
+
+<!-- Book & Member Tools -->
+<div class="row justify-content-center mt-4 mb-4 gx-3">
+  <div class="col-md-4">
+    <form method="get" action="{% url 'book-detail' %}">
+      <div class="input-group">
+        <input type="text" name="title" class="form-control" placeholder="Book Title" required>
+        <button class="btn btn-primary">Book History</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-4">
+    <form method="get" action="{% url 'member-history' %}">
+      <div class="input-group">
+        <input type="text" name="name" class="form-control" placeholder="Member Name" required>
+        <button class="btn btn-success">Member History</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-2">
+    <a href="{% url 'admin-summary' %}" class="btn btn-warning w-100">Admin Summary</a>
+  </div>
+</div>
+
+<hr />
+
+<!-- Borrow / Return / Report Forms -->
+<div class="row justify-content-center gx-4">
+  <div class="col-md-6">
+
+    <!-- Borrow Form -->
+    <h4>Borrow a Book</h4>
+    <form id="borrow-form" class="mb-4">
+      {% csrf_token %}
+      <input name="member_name" class="form-control mb-2" placeholder="Member Name" required>
+      <input name="book_title" class="form-control mb-2" placeholder="Book Title" required>
+      <input type="date" name="due_date" class="form-control mb-2" required>
+      <button type="submit" class="btn btn-primary w-100">Borrow</button>
+    </form>
+
+    <!-- Return Form -->
+    <h4>Return a Book</h4>
+    <form id="return-form" class="mb-4">
+      {% csrf_token %}
+      <input name="member_name" class="form-control mb-2" placeholder="Member Name" required>
+      <input name="book_title" class="form-control mb-2" placeholder="Book Title" required>
+      <button type="submit" class="btn btn-success w-100">Return</button>
+    </form>
+
+    <!-- Report Lost/Damaged Form -->
+    <h4>Report Lost/Damaged</h4>
+    <form id="report-form" class="mb-4">
+      {% csrf_token %}
+      <input name="member_name" class="form-control mb-2" placeholder="Member Name" required>
+      <input name="book_title" class="form-control mb-2" placeholder="Book Title" required>
+      <select name="status_type" class="form-select mb-2" required>
+        <option value="">Choose</option>
+        <option value="lost">Lost</option>
+        <option value="damaged">Damaged</option>
+      </select>
+      <button type="submit" class="btn btn-danger w-100">Report</button>
+    </form>
+
+    <!-- List of Available Books -->
+    <h4 class="mt-5">Books Available to Borrow</h4>
+    <ul class="list-group">
+      {% for b in available_books %}
+        <li class="list-group-item" data-title="{{ b.title }}">
+            {{ b.title }} ({{ b.available_copies }} copies)
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">No books available</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<!-- AJAX Script -->
+<script>
+const csrfToken = '{{ csrf_token }}';
+
+function displayAlert(type, msg) {
+  const container = document.getElementById('alert-container');
+  container.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+}
+
+function updateBookInList(title, newCount) {
+  console.log('Updating list for', title, 'to count', newCount);
+  const li = document.querySelector(`.list-group-item[data-title="${title}"]`);
+  if (li) {
+    li.textContent = `${title} (${newCount} copies)`;
+  } else {
+    console.warn('List item not found:', title);
+  }
+}
+
+
+
+async function handleForm(formId, url) {
+  document.getElementById(formId).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form));
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json().catch(() => null);
+    if (res.ok && json?.message) {
+    console.log('API response:', json);  // Add this line
+    displayAlert('success', json.message);
+    form.reset();
+    if (json.book_title && typeof json.new_available === 'number') {
+        updateBookInList(json.book_title, json.new_available);
+    }
+    }
+    else if (json?.error) {
+        displayAlert('danger', json.error);
+        } else {
+        displayAlert('danger', 'Unexpected error occurred.');
+        }
+    });
+}
+
+handleForm('borrow-form', "{% url 'borrow-book' %}");
+handleForm('return-form', "{% url 'return-book' %}");
+handleForm('report-form', "{% url 'report-lost-or-damaged' %}");
+</script>
+{% endblock %}

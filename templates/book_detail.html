@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} – Book Details{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📘 {{ book.title }}</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <ul class="list-group">
+            <li class="list-group-item"><strong>Code:</strong> {{ book.code }}</li>
+            <li class="list-group-item"><strong>Author:</strong> {{ book.author }}</li>
+            <li class="list-group-item"><strong>Category:</strong> {{ book.category.name }}</li>
+            <li class="list-group-item"><strong>Total Copies:</strong> {{ book.total_copies }}</li>
+            <li class="list-group-item"><strong>Available Copies:</strong> {{ book.available_copies }}</li>
+        </ul>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h4>📖 Borrowing History</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Member</th>
+            <th>Borrowed On</th>
+            <th>Due Date</th>
+            <th>Returned On</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in borrow_history %}
+        <tr>
+            <td>{{ record.member.full_name }}</td>
+            <td>{{ record.borrow_date|date:"Y-m-d" }}</td>
+            <td>{{ record.due_date|date:"Y-m-d" }}</td>
+            <td>
+                {% if record.return_date %}
+                    {{ record.return_date|date:"Y-m-d" }}
+                {% else %}
+                    <span class="text-danger">Not Returned</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if record.return_date %}
+                    ✅ Returned
+                {% elif record.due_date < today %}
+                    🔴 Overdue
+                {% else %}
+                    ⏳ Borrowed
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No borrowing history available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard Summary{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📊 Admin Dashboard Summary</h2>
+
+<div class="row mb-4">
+    {% for key, value in summary.totals.items %}
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <!-- {{ key|cut:"_"|title }} -->
+
+                <h5 class="card-title text-muted">{{ key|cut:"_"|title }}</h5>
+                <h3>{{ value }}</h3>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h4>📕 Currently Borrowed Books</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th><th>Code</th><th>Borrowed By</th><th>Due Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in summary.lists.currently_borrowed %}
+        <tr>
+            <td>{{ item.title }}</td>
+            <td>{{ item.code }}</td>
+            <td>{{ item.borrowed_by }}</td>
+            <td>{{ item.due_date }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No books are currently borrowed.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="mt-5">📙 Lost or Damaged Books</h4>
+<div class="row">
+    <div class="col-md-6">
+        <h5>Lost Books</h5>
+        <ul class="list-group">
+            {% for book in summary.lists.lost_books %}
+            <li class="list-group-item">
+                {{ book.title }} ({{ book.code }}) – {{ book.logged_at|date:"Y-m-d H:i" }}
+            </li>
+            {% empty %}
+            <li class="list-group-item">No lost books.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h5>Damaged Books</h5>
+        <ul class="list-group">
+            {% for book in summary.lists.damaged_books %}
+            <li class="list-group-item">
+                {{ book.title }} ({{ book.code }}) – {{ book.logged_at|date:"Y-m-d H:i" }}
+            </li>
+            {% empty %}
+            <li class="list-group-item">No damaged books.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<h4 class="mt-5">📉 Low Stock Books</h4>
+<ul class="list-group">
+    {% for book in summary.lists.low_stock_books %}
+    <li class="list-group-item">
+        {{ book.title }} ({{ book.code }}) – {{ book.available }} copies left
+    </li>
+    {% empty %}
+    <li class="list-group-item">No low stock books.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

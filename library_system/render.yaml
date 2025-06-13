@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: library-app
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn library_system.wsgi
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: library_system.settings
+      - key: PYTHON_VERSION
+        value: 3.10

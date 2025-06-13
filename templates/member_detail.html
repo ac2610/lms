@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Borrowing History for {{ member.full_name }}</h2>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% if borrow_history %}
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for record in borrow_history %}
+                        <li class="list-group-item">
+                            <strong>Book:</strong> {{ record.book.title }} <br>
+                            <strong>Borrowed on:</strong> {{ record.borrow_date|date:"M d, Y" }} <br>
+                            <strong>Returned on:</strong> {{ record.return_date|date:"M d, Y"|default:"Not Returned Yet" }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted">No borrowing history available.</p>
+    {% endif %}
+</div>
+{% endblock %}
